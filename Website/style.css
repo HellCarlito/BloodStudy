@@ -1,0 +1,62 @@
+@font-face {
+    font-family: 'theFont'; /*a name to be used later*/
+    src: url('Lumberjack-Regular.ttf'); /*URL to font*/
+}
+
+html,body{ 
+	margin: 0;
+	padding:0;
+	height:100vh;
+	text-align: center;
+	font-family: 'theFont';
+	font-size: 3vh;
+}
+
+#background{ 
+	background:#FFE3AA; 
+}
+
+#child{ 
+	position: absolute;
+	top : 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 50%;
+	width: 50%;
+	margin: auto;
+}
+
+#header{ 
+	height:20vh; 
+	width:70%;
+	background:#042037;
+	margin: auto;
+	color : white;
+	position: relative;
+}
+
+#body{ 
+	height:70vh; 
+	width:70%;
+	background:#496C89;
+ 	margin: auto;
+}
+
+
+#buttonAndInput{
+	font-family: 'theFont';
+	font-size: 3vh;
+}
+
+#bottom{ 
+	height:10vh; 
+	width:70%;
+	background:#042037;
+	margin: auto;
+	color : white;
+}
+
+#bottomChild{ 
+	line-height: 10vh;
+}
