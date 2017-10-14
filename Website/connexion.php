@@ -1,5 +1,6 @@
 <?php 
    session_start();
+   ob_start();
    require 'mysql_query.php';
 ?>
 <!doctype html>
@@ -64,14 +65,17 @@
                            if ($ligne["niveauAcces"] == 1)
                               {
                               header('Location:CLR.php');
+                              ob_end_flush();
                               }
                            elseif ($ligne["niveauAcces"] == 2)
                               {
                               header('Location:CS.php');
+                              ob_end_flush();
                               }
                              else
                               {
                               header('Location:LPH.php');
+                              ob_end_flush();
                               }
                            }
                         }

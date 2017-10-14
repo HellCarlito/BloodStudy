@@ -3,6 +3,7 @@
 	if(!isset($_SESSION['identifiant'])) {
 		header('Location:connexion_fail.php');
 	}
+	ob_start();
 ?>
 <!doctype html>
 <html lang="fr">
@@ -43,10 +44,12 @@
 					if (isset($_POST['extraction_donnees']))
 						{
 						header('Location:CS_extraction.php');
+						ob_end_flush();
 						}
 					elseif (isset($_POST['analyse']))
 						{
 						header('Location:CS_analyse.php');
+						ob_end_flush();
 						}
 
 					?>

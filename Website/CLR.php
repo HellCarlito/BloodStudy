@@ -4,6 +4,7 @@
 		header('Location:connexion_fail.php');
 	}
    require 'mysql_query.php';
+   $ok = true;
 
 ?>
 <!doctype html>
@@ -107,74 +108,90 @@
 
 						include ("initialisation.php");
 
-						$query = "SELECT * FROM patient WHERE idPatient='$idPatient'";
-						if (database::query($query, false) == 0)
-							{ //patient n'est pas dans la base --> création
-							if ($visit == 'VINC')
-								{ //le patient commence par VINC obligatoirement
-								$query = "INSERT into patient VALUES ($idPatient);";
-								database::query($query, false);
-								$query = "INSERT into analyse VALUES (null, $GR, $GB, $plaquettes, NOW(),'$visit', '$date', $idPatient, WEEKOFYEAR(NOW()), MONTH(NOW()), YEAR(NOW()), 'En attente de traitement', 'En attente de traitement', 'En attente de traitement');";
-								database::query($query, false);
-								echo "Les données ont bien été enregistrées.";
-								}
-							  elseif ($visit == 'V1' || $visit == 'V2')
-								{
-								echo "La visite du patient " . $idPatient . " ne peut être que la visite d'inclusion VINC.";
+						//Vérification si une date antérieure à la date VINC est entrée
+
+						if($visit == 'V1' OR $visit == 'V2') {
+							$query = "SELECT visiteDate FROM analyse WHERE idPatient='$idPatient' AND visitName='VINC'";
+							foreach(database::query($query, true) as $ligne){							
+								if (explode("-", $date) < explode("-", $ligne["visiteDate"])) { //explode : 2017-10-13 -> 20172013
+									echo "La date de visite de ".$visit." ne peut être inférieure à celle de VINC. Veuillez recommencer.";
+									$ok = false;
 								}
 							}
-						  else
-							{
+						}						
 
-							// ajout d'une analyse
+						if ($ok==true) {
 
-							$query = "SELECT * FROM analyse WHERE idPatient='$idPatient'";
-							$cpt_v1 = 0;
-							$cpt_v2 = 0;
-							foreach(database::query($query, true) as $ligne)
-								{
-								if ($ligne["visitName"] == 'VINC')
-									{
-									$cpt_vinc = 1;
+							$query = "SELECT * FROM patient WHERE idPatient='$idPatient'";
+							if (database::query($query, false) == 0)
+								{ //patient n'est pas dans la base --> création
+								if ($visit == 'VINC')
+									{ //le patient commence par VINC obligatoirement
+									$query = "INSERT into patient VALUES ($idPatient);";
+									database::query($query, false);
+									$query = "INSERT into analyse VALUES (null, $GR, $GB, $plaquettes, NOW(),'$visit', '$date', $idPatient, WEEKOFYEAR(NOW()), MONTH(NOW()), YEAR(NOW()), 'En attente de traitement', 'En attente de traitement', 'En attente de traitement');";
+									database::query($query, false);
+									echo "Les données ont bien été enregistrées.";
 									}
-								elseif ($ligne["visitName"] == 'V1')
+								  elseif ($visit == 'V1' || $visit == 'V2')
 									{
-									$cpt_v1 = 1;
+									echo "La visite du patient " . $idPatient . " ne peut être que la visite d'inclusion VINC.";
 									}
-								elseif ($ligne["visitName"] == 'V2')
-									{
-									$cpt_v2 = 1;
-									}
-								}
-
-							if (($cpt_vinc == 1 AND $cpt_v1 == 0 AND $cpt_v2 == 0 AND $visit == 'V1') OR ($cpt_vinc == 1 AND $cpt_v1 == 1 AND $cpt_v2 == 0 AND $visit == 'V2'))
-								{ //VINC > V1 > V2
-								echo "Les données ont bien été enregistrées.";
-								$query = "INSERT into analyse VALUES (null, $GR, $GB, $plaquettes, NOW(), '$visit', '$date', $idPatient, WEEKOFYEAR(NOW()), MONTH(NOW()), YEAR(NOW()), 'En attente de traitement', 'En attente de traitement', 'En attente de traitement');";
-								database::query($query, false);
 								}
 							  else
 								{
-								echo "Le patient " . $idPatient . " ne peut pas faire la visite " . $visit . ". L'ordre des visites est VINC > V1 > V2. La prochaine visite de ce patient est : ";
-								if ($cpt_vinc == 1 AND $cpt_v1 == 0 AND $cpt_v2 == 0)
+
+								// ajout d'une analyse
+
+								$query = "SELECT * FROM analyse WHERE idPatient='$idPatient'";
+								$cpt_v1 = 0;
+								$cpt_v2 = 0;
+								foreach(database::query($query, true) as $ligne)
 									{
-									echo "V1.";
-									}
-								elseif ($cpt_vinc == 1 AND $cpt_v1 == 1 AND $cpt_v2 == 0)
-									{
-									echo "V2.";
-									}
-								elseif ($cpt_vinc == 1 AND $cpt_v1 == 1 AND $cpt_v2 == 1)
-									{
-									echo "le patient a fait toutes ses visites.";
+									if ($ligne["visitName"] == 'VINC')
+										{
+										$cpt_vinc = 1;
+										}
+									elseif ($ligne["visitName"] == 'V1')
+										{
+										$cpt_v1 = 1;
+										}
+									elseif ($ligne["visitName"] == 'V2')
+										{
+										$cpt_v2 = 1;
+										}
 									}
 
-								echo " Veuillez recommencer la saisie.";
+								if (($cpt_vinc == 1 AND $cpt_v1 == 0 AND $cpt_v2 == 0 AND $visit == 'V1') OR ($cpt_vinc == 1 AND $cpt_v1 == 1 AND $cpt_v2 == 0 AND $visit == 'V2'))
+									{ //VINC > V1 > V2
+									echo "Les données ont bien été enregistrées.";
+									$query = "INSERT into analyse VALUES (null, $GR, $GB, $plaquettes, NOW(), '$visit', '$date', $idPatient, WEEKOFYEAR(NOW()), MONTH(NOW()), YEAR(NOW()), 'En attente de traitement', 'En attente de traitement', 'En attente de traitement');";
+									database::query($query, false);
+									}
+								  else
+									{
+									echo "Le patient " . $idPatient . " ne peut pas faire la visite " . $visit . ". L'ordre des visites est VINC > V1 > V2. La prochaine visite de ce patient est : ";
+									if ($cpt_vinc == 1 AND $cpt_v1 == 0 AND $cpt_v2 == 0)
+										{
+										echo "V1.";
+										}
+									elseif ($cpt_vinc == 1 AND $cpt_v1 == 1 AND $cpt_v2 == 0)
+										{
+										echo "V2.";
+										}
+									elseif ($cpt_vinc == 1 AND $cpt_v1 == 1 AND $cpt_v2 == 1)
+										{
+										echo "le patient a fait toutes ses visites.";
+										}
+
+									echo " Veuillez recommencer la saisie.";
+									}
 								}
 							}
 						}
 
-					?>
+						?>							
+
 
 				</div>
 			</div>

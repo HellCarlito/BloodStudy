@@ -1,8 +1,10 @@
 <?php 
 	session_start();
+	ob_start();
 
 	if(!isset($_SESSION['identifiant'])) {
 		header('Location:connexion_fail.php');
+		ob_end_flush();
 	}
 
 	if(isset($_POST["extraction_LPH"])){
@@ -31,6 +33,7 @@
 <?php			
 									echo "Vous deviez renseigner tous les champs. Veuillez recommencer. Redirection...";
 									header('Refresh: 2; URL=LPH.php');
+									ob_end_flush();
 ?>
 							</div>
 						</div>
@@ -75,7 +78,8 @@
 								<div id="child">
 <?php				
 										echo "Aucune donnée pour le mois ".$month." de l'année ".$year.". Redirection...";
-										header('Refresh: 4; URL=LPH.php'); 
+										header('Refresh: 4; URL=LPH.php');
+										ob_end_flush(); 
 ?>
 								</div>
 							</div>

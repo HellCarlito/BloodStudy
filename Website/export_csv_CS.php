@@ -1,8 +1,10 @@
 <?php 
 	session_start();
+	ob_start();
 
 	if(!isset($_SESSION['identifiant'])) {
 		header('Location:connexion_fail.php');
+		ob_end_flush();
 	}
 
 	if(isset($_POST["extraction"])){
@@ -31,6 +33,7 @@
 <?php			
 									echo "Vous deviez renseigner tous les champs. Veuillez recommencer. Redirection...";
 									header('Refresh: 2; URL=CS_extraction.php');
+									ob_end_flush();
 ?>
 							</div>
 						</div>
@@ -77,6 +80,7 @@
 <?php				
 										echo "Aucune donnée pour la semaine ".$week." de l'année ".$year.". Redirection...";
 										header('Refresh: 4; URL=CS_extraction.php');
+										ob_end_flush();
 ?>	
 								</div>
 							</div>
